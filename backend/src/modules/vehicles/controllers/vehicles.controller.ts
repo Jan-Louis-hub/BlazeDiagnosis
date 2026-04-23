@@ -20,4 +20,8 @@ export class VehiclesController {
   update(id: string, payload: unknown) {
     return ok(this.service.update(id, validateUpdateVehicleInput(payload)));
   }
+
+  archive(id: string) {
+    return ok(this.service.archive(id));
+  }
 }

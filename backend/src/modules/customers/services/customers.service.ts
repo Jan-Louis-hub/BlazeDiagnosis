@@ -20,6 +20,11 @@ export class CustomersService {
   }
 
   create(input: CreateCustomerDto): CustomerEntity {
+    const duplicate = this.repository.findDuplicate(input.tenantId, input.mobileNumber, input.email);
+    if (duplicate) {
+      throw new Error('A customer with the same phone number or email already exists.');
+    }
+
     return this.repository.create({
       id: nextEntityId('cust'),
       ...createAuditTimestamps(),
@@ -33,10 +38,28 @@ export class CustomersService {
       preferredCommunicationChannel: input.preferredCommunicationChannel,
       marketingConsent: input.marketingConsent ?? false,
       tenantId: input.tenantId,
+      isArchived: false,
     });
   }
 
   update(id: string, input: UpdateCustomerDto): CustomerEntity {
+    const existing = this.getById(id);
+    const tenantId = input.tenantId ?? existing.tenantId;
+    const mobileNumber = input.mobileNumber ?? existing.mobileNumber;
+    const email = input.email ?? existing.email;
+    if (!tenantId) {
+      throw new Error('Customer tenant is required.');
+    }
+
+    const duplicate = this.repository.findDuplicate(tenantId, mobileNumber, email, id);
+    if (duplicate) {
+      throw new Error('A customer with the same phone number or email already exists.');
+    }
+
     return this.repository.update(id, input);
+  }
+
+  archive(id: string) {
+    return this.repository.archive(id);
   }
 }

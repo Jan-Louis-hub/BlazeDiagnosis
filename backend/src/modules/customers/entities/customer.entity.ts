@@ -10,4 +10,6 @@ export interface CustomerEntity extends BaseEntity {
   taxNumber?: string;
   preferredCommunicationChannel?: 'EMAIL' | 'SMS' | 'WHATSAPP';
   marketingConsent: boolean;
+  isArchived?: boolean;
+  archivedAt?: Date;
 }

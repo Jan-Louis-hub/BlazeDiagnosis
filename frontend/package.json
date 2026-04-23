@@ -7,5 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "echo \"Add linter\""
+  },
+  "dependencies": {
+    "next": "15.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }

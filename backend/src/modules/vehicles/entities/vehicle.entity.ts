@@ -13,4 +13,6 @@ export interface VehicleEntity extends BaseEntity {
   transmission?: string;
   odometer?: number;
   color?: string;
+  isArchived?: boolean;
+  archivedAt?: Date;
 }

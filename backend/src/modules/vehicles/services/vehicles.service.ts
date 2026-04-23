@@ -20,6 +20,11 @@ export class VehiclesService {
   }
 
   create(input: CreateVehicleDto): VehicleEntity {
+    const duplicate = this.repository.findDuplicate(input.tenantId, input.registrationNumber, input.vin);
+    if (duplicate) {
+      throw new Error('A vehicle with the same registration number or VIN already exists.');
+    }
+
     return this.repository.create({
       id: nextEntityId('veh'),
       ...createAuditTimestamps(),
@@ -36,10 +41,28 @@ export class VehiclesService {
       transmission: input.transmission,
       odometer: input.odometer,
       color: input.color,
+      isArchived: false,
     });
   }
 
   update(id: string, input: UpdateVehicleDto): VehicleEntity {
+    const existing = this.getById(id);
+    const tenantId = input.tenantId ?? existing.tenantId;
+    const registrationNumber = input.registrationNumber ?? existing.registrationNumber;
+    const vin = input.vin ?? existing.vin;
+    if (!tenantId) {
+      throw new Error('Vehicle tenant is required.');
+    }
+
+    const duplicate = this.repository.findDuplicate(tenantId, registrationNumber, vin, id);
+    if (duplicate) {
+      throw new Error('A vehicle with the same registration number or VIN already exists.');
+    }
+
     return this.repository.update(id, input);
+  }
+
+  archive(id: string) {
+    return this.repository.archive(id);
   }
 }

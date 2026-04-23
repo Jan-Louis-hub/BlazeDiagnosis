@@ -51,3 +51,39 @@ The starter now includes:
 ### Demo credentials
 - Email: `admin@demo-workshop.local`
 - Password: `demo1234`
+
+---
+
+## Repository bootstrap
+
+### Workspace layout
+- `backend/` API and domain modules
+- `frontend/` Next.js application
+- `docs/` product, API, schema, and planning documents
+- `.github/workflows/` CI placeholder
+
+### Quick start
+1. Copy `.env.example` to `.env`.
+2. Copy `backend/.env.example` to `backend/.env` if you want backend-local overrides.
+3. Copy `frontend/.env.example` to `frontend/.env.local`.
+4. Start local services with `docker-compose up -d`.
+5. Install dependencies in each workspace.
+6. Run `npm run db:generate`.
+7. Run `npm run db:migrate`.
+8. Run `npm run db:seed`.
+9. Start the backend with `npm run dev:backend`.
+10. Start the frontend with `npm run dev:frontend`.
+
+### Current repo foundation status
+- Root workspace scripts added.
+- Shared env templates added.
+- Docker local services added for Postgres and Redis.
+- Prisma generate/migrate/seed tooling added.
+- GitHub Actions CI placeholder added.
+
+### Still expected later
+- Real lint and test runners.
+- Root lockfile and dependency installation.
+- Production deploy workflows.
+- Secrets management per environment.
+- Prisma migration history generated from live schema updates.
