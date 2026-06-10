@@ -21,7 +21,7 @@ To protect workshop profitability, staff privacy, and operational security, cust
 
 ### Authorization and Role Based Access (RBAC) Risks
 
-#### 1. Customers Snooping (BOLA)
+#### 1. Customers Snooping 
 * **The Risk:** A tech-savvy customer changes a number in the app’s URL or API request (e.g., from `job/101` to `job/102`) and views another customer's car details, invoices, or personal info.
 * **Fix:** The server must check that the logged-in user actually owns that specific vehicle/job on **every single request**. Never rely on the frontend to block this.
 
@@ -33,6 +33,6 @@ To protect workshop profitability, staff privacy, and operational security, cust
 * **The Risk:** If this app is sold to multiple different mechanic businesses, a bug in the code allows Workshop A to accidentally see the customer list or financial data of Workshop B.
 * **Fix:** Use Row-Level Security (RLS) in the database to automatically isolate each workshop's data.
 
-#### 4. Shared Workshop Tablets (Session Hijacking in simple terms)
+#### 4. Shared Workshop Tablets 
 * **The Risk:** Mechanics log into shared shop tablets using admin accounts and leave them open. Customers or apprentices can then access sensitive business settings.
 * **Fix:** Set short session timeouts and auto-logout features for devices used on the workshop floor.
