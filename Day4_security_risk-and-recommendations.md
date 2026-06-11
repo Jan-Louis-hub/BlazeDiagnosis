@@ -25,3 +25,27 @@
     * Assigned Severity: MEDIUM (CVSS v3.1 Score: 6.1)
     * Vulnerability Breakdown: Text areas within the application—such as mechanic job progress cards or customer vehicle issue descriptions—that accept unvalidated input provide a vector for script injection. If the Next.js frontend or Prisma database layer processes raw input text without strict filtering, malicious JavaScript can be permanently saved to the database.
     * Operational Impact: When other staff members or administrators view the compromised job card, the injected script executes automatically inside their browser session. This can lead to session hijacking, administrative cookie theft, and unauthorized actions performed within the application workspace.
+
+
+### Task3 Security Recomendations
+### 1. Blaze Diagnostics Software Engineering Remediations
+
+1. Implementation of Explicit Multi-Tenant Isolation Middleware
+    * Technical Remediation: Enforce strict backend validation by routing all requests for customers, vehicles, and jobs through the backend/src/shared/middleware/tenant-scope.ts file. The router must explicitly run the enforceTenantScope() and ensureRecordInTenant() functions. This binds every database query to the session context's verified tenant ID, entirely rejecting any client-supplied tenant overrides.
+    * Code-Level Strategy: Ensure the application layer ignores any tenantId fields sent in the request body from client browsers. Instead, always inject the cryptographically verified AuthContext.tenantId directly into the Prisma query context.
+
+2. Context-Aware Cryptographic Object Validation
+    * Technical Remediation: Refactor all financial and reporting endpoints inside backend/src/shared/middleware/authorization.ts to implement strict requirePermission(context, 'customer.read') checkpoints. The system must verify that the requesting user's AuthContext token contains explicit permissions matching the precise object ID requested from the PostgreSQL database before returning data.
+    * Code-Level Strategy: Use composite database keys combining the id and tenantId fields for all lookups. This ensures that even if an object ID is guessed, the query will return a safe 404 Not Found error unless the object explicitly belongs to the user's validated tenant space.
+
+3. Adaptive Network Rate-Limiting and IP Throttling Pipelines
+    * Technical Remediation: Integrate an active rate-limiting framework (like express-rate-limit) directly onto the /api/auth/login endpoint. Configure the application layer to track authentication attempts by IP address and username. Limit accounts to a maximum of 5 failed logins within a rolling 15-minute window, routing subsequent traffic to a temporary block page or enforcing a mandatory CAPTCHA challenge.
+    * Code-Level Strategy: Connect the rate-limiter middleware to an active Redis instance. This ensures that rate limits are tracked accurately across multiple running server instances, preventing attackers from bypassing restrictions by distributing attacks across different containers.
+
+4. Decoupled Key Provisioning and Token Expiration Policies
+    * Technical Remediation: Move all cryptographic keys entirely out of the repository structure. Use the GitHub repository interface (Settings > Secrets and variables > Actions) to inject secret keys at deployment. Enforce tight token expiration settings in the codebase: set access tokens (ACCESS_TOKEN_TTL) to 15m and refresh tokens (REFRESH_TOKEN_TTL) to 7d.
+    * Code-Level Strategy: Implement token blocklisting within Redis. This allows the backend to instantly revoke active refresh tokens during password resets or when anomalous access patterns are detected.
+
+5. Context-Specific Output Encoding and Strict Content Security Policies
+    * Technical Remediation: Implement strict input sanitization using libraries like DOMPurify on the backend before data commits to the PostgreSQL database. Ensure the Next.js frontend uses secure rendering patterns that treat inputs strictly as text strings, avoiding vulnerable alternatives like dangerouslySetInnerHTML unless input is explicitly sanitized.
+    * Code-Level Strategy: Configure a robust Content Security Policy header using Next.js middleware. This policy should explicitly block inline script executions (script-src 'self') and restrict script sources exclusively to verified application domains.
