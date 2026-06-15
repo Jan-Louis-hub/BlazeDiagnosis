@@ -2,6 +2,9 @@ import { createCustomerSchema } from '@/features/customers/schemas/customer.sche
 import { createCustomer } from '@/features/customers/services/customer.service';
 import { requireTenantContext } from '@/lib/tenancy/tenant-context';
 import { NextResponse } from 'next/server';
+import { db } from '@/db/client';
+import { customers } from '@/db/schema/customers';
+import { and, eq } from 'drizzle-orm';
 
 export async function GET(request: Request) {
     try {
@@ -16,12 +19,29 @@ export async function GET(request: Request) {
                 {status: 400}
             );
         }
-    }
-};
+          const activeCustomers = await db
+      .select()
+      .from(customers)
+      .where(
+        and(
+          eq(customers.tenantId, tenantId),
+          eq(customers.isArchived, false)
+        )
+      );
 
-// TODO: Query the database for active or non-archived
-// Add the catch statement to the try operator dont forget to return JSON
-// Add the POST method to create a new customer and return the created customer in the response
+    // Return the clean data list payload
+    return NextResponse.json(activeCustomers);
+
+// Implemented the catch sequence for the error handling.
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
+// TODO: Add the POST method to create a new customer and return the created customer in the response
 
 export async function POST(req: Request) {
   try {
