@@ -57,5 +57,22 @@ export async function getCustomerById(tenantId: string, customerId: string) {
     .where(and(eq(customers.tenantId, tenantId), eq(customers.id, customerId)))
     .limit(1);
 
+
   return customer ?? null;
+}
+
+export async function deleteCustomer(
+  tenantId: string,
+  customerId: string
+) {
+  // Ensure user has permission to delete customers
+  await requireTenantPermission(tenantId, 'customers.write');
+  // Delete customer only within the current tenant
+  await db
+    .delete(customers)
+    .where(and(
+      eq(customers.tenantId, tenantId), 
+      eq(customers.id, customerId)
+    )
+  );
 }
