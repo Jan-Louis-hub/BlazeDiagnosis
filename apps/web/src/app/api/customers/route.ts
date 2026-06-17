@@ -9,6 +9,7 @@ import { ZodError } from 'zod';
 
 export async function GET(request: Request) {
     try {
+        const tenant = await requireTenantContext();
         // Get the tenantId from the URL query string
         const {searchParams} = new URL(request.url);
         const tenantId = searchParams.get('tenantId');

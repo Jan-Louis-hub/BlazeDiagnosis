@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import {db} from "@/db/client";
-import {customers} from "@/db/schema";
+import { vehicles} from "@/db/schema";
 import {and, eq} from "drizzle-orm";
 import { requireTenantContext } from '@/lib/tenancy/tenant-context';
 import { createVehicleSchema } from '@/features/vehicles/schemas/vehicle.schema';
 import { createVehicle } from '@/features/vehicles/services/vehicle.service';
+import { ZodError } from 'zod';
 
 export async function GET(request: Request) {
     try {
@@ -18,18 +19,18 @@ export async function GET(request: Request) {
                 {error: 'Missing required tenantId parameter'},
                 {status: 400}
             );
-        } const activeCustomers = await db
+        } const vehicle = await db
       .select()
-      .from(customers)
+      .from(vehicles)
       .where(
         and(
-          eq(customers.tenantId, tenantId),
-          eq(customers.isArchived, false)
+          eq(vehicles.tenantId, tenantId),
+          eq(vehicles.isArchived, false)
         )
       );
 
     // Return the clean data list payload
-    return NextResponse.json(activeCustomers);
+    return NextResponse.json(vehicle, { status: 200 });
 
 // Implemented the catch sequence for the error handling.
   } catch (error) {
