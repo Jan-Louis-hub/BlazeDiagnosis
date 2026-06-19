@@ -19,8 +19,11 @@ export default async function Page({ searchParams }: PageProps) {
   const activeAction = params.action;
   const activeEntityType = params.entityType;
 
-  // 1. Conditionally append dynamic Drizzle filter clauses 
-  const conditions = [];
+  // SESSION MANAGER: QA Demo placeholder tenant boundary context injection
+  const activeTenantId = '00000000-0000-0000-0000-000000000001';
+
+  // 1. Conditionally append dynamic Drizzle filter clauses with tenant isolation base constraint
+  const conditions = [eq(auditLogs.tenantId, activeTenantId)];
   
   if (activeAction) {
     conditions.push(eq(auditLogs.action, activeAction));
@@ -30,22 +33,24 @@ export default async function Page({ searchParams }: PageProps) {
     conditions.push(eq(auditLogs.entityType, activeEntityType));
   }
 
-  // 2. Fetch filtered records from PostgreSQL
+  // 2. Fetch isolated and filtered records from PostgreSQL
   const logs = await db
     .select()
     .from(auditLogs)
-    .where(conditions.length > 0 ? and(...conditions) : undefined)
+    .where(and(...conditions))
     .orderBy(desc(auditLogs.createdAt));
 
-  // 3. Query distinct database values to keep dropdown option arrays live and dynamic
+  // 3. Query isolated distinct values to keep dropdown option arrays live, dynamic, and leak-free
   const distinctActions = await db
     .selectDistinct({ action: auditLogs.action })
     .from(auditLogs)
+    .where(eq(auditLogs.tenantId, activeTenantId))
     .orderBy(auditLogs.action);
 
   const distinctEntities = await db
     .selectDistinct({ entityType: auditLogs.entityType })
     .from(auditLogs)
+    .where(eq(auditLogs.tenantId, activeTenantId))
     .orderBy(auditLogs.entityType);
 
   return (
