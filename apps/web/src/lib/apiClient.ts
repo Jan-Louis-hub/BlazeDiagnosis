@@ -41,9 +41,9 @@ export async function fetchVehiclesForCustomer(customerId: string) {
 }
 
 
-export async function fetchCustomerIntakeHistory(customerid:string)
+export async function fetchCustomerIntakeHistory(customerId:string)
 {
-  return requestJson<{ intakes: VehicleRecord[] }>(`/api/customer-intakes?customerId=${customerid}`, {
+  return requestJson<{ intakes: VehicleRecord[] }>(`/api/customer-intakes?customerId=${customerId}`, {
     errorMessage: 'Failed to fetch customer intake history'
   })
 }
@@ -57,7 +57,7 @@ export async function createCustomerVehicleIntake(intakeData: unknown) {
   });
 }
 
-export async function createCustomer(customerData: unknown) {
+export async function createCustomer(customerId: string, customerData: unknown) {
   return requestJson<Customer>(`/api/customers/${customerId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
