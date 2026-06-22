@@ -1,5 +1,6 @@
 import type { ApiResponse } from '@/types/api';
 import type { Customer } from '@/types/customers';
+import { VehicleRecord } from '@/types/vehicles';
 
 type RequestOptions = RequestInit & {
   errorMessage?: string;
@@ -31,4 +32,12 @@ export async function fetchVehiclesForCustomer(customerId: string) {
   return requestJson<{ vehicles: unknown[] }>(`/api/vehicles/${customerId}`, {
     errorMessage: 'Failed to fetch customer vehicles.',
   });
+}
+
+
+export async function fetchCustomerIntakeHistory(customerid:string)
+{
+  return requestJson<{ intakes: VehicleRecord[] }>(`api/api/customer-intakes?customerId=${customerid}`,{
+    errorMessage: 'Failed to fetch customer intake history'
+  })
 }
