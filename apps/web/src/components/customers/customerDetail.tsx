@@ -27,29 +27,31 @@ interface Vehicle {
 interface Job {
   id: number;
   title: string;
-  status: string;
+  status: string; // Defines the status job object
 }
-
+//Defines the Quote objects in a interface
 interface Quote {
   id: number;
   reference: string;
   total: number;
 }
-
+//Displays all details for a customer(vehicles,jobs and quotes) fetched from an api
 export default function CustomerDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const customerId = id ? parseInt(id) : null;
-
+//Tracks wether a page is still loading and holds errors,declares state for customer data,vehicles,jobs and quotes
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+//Runs once the component mounts,validates the ID then fetches all related data from the API in sequence
   useEffect(() => {
+    //Validates the ID then fetches all related data from the API in sequence     
     if (!customerId) {
+      //If there is no ID in the URL set error and stop loading
       setError("Invalid customer ID");
       setLoading(false);
       return;
@@ -57,21 +59,23 @@ export default function CustomerDetailPage() {
 
     const loadData = async () => {
       try {
+        //fetches customer's core details and gives an error if none found
         // Customer
         const customerRes = await fetch(`/api/customers/${customerId}`);
         if (!customerRes.ok) throw new Error("Customer not found");
         setCustomer(await customerRes.json());
-
+        //fetches all vehicles linked to the customer
         // Vehicles
         const vehicleRes = await fetch(`/api/vehicles?customerId=${customerId}`);
         if (vehicleRes.ok) setVehicles(await vehicleRes.json());
-
+         //fetch all jobs linked to the customer
         // Jobs
         const jobRes = await fetch(`/api/jobs?customerId=${customerId}`);
         if (jobRes.ok) setJobs(await jobRes.json());
-
+        //fetches all the quotes linked to this customer
         // Quotes
         const quoteRes = await fetch(`/api/quotes?customerId=${customerId}`);
+         //if any fetch fails,capture the erro message to display to the user
         if (quoteRes.ok) setQuotes(await quoteRes.json());
       } catch (err: any) {
         setError(err.message || "Failed to load customer data");
