@@ -8,10 +8,45 @@ import {
   FeatureMetricGrid,
   FeatureRecordList,
 } from '@/components/common/featureDashboard';
+import { DefectSeverityBadge } from '@/components/job-cards/DefectSeverityBadge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { JobWorkPanel } from '@/features/job-cards/components/jobWorkPanel';
 import { StaffingPanel } from '@/features/job-cards/components/staffingPanel';
 import { stationChecklist, stationJobRecords } from '@/lib/sampleWorkflows';
+
+const SEVERITY_EXAMPLES: Array<{
+  id: string;
+  finding: string;
+  severity: unknown;
+}> = [
+  {
+    id: 'sev-normal',
+    finding: 'Battery voltage and terminal torque within spec',
+    severity: 'normal',
+  },
+  {
+    id: 'sev-advisory',
+    finding: 'Front brake pads at 4 mm — monitor or plan replacement',
+    severity: 'advisory',
+  },
+  {
+    id: 'sev-critical',
+    finding: 'Brake line leak — hold vehicle from release',
+    severity: 'critical',
+  },
+  {
+    id: 'sev-unknown',
+    finding: 'Unrecognized severity code from legacy import',
+    severity: 'legacy_code',
+  },
+];
 
 export default function StationJobCardsPage() {
   return (
@@ -48,6 +83,24 @@ export default function StationJobCardsPage() {
         items={stationChecklist}
         title="Job-card implementation checklist"
       />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Defect severity classification</CardTitle>
+          <CardDescription>
+            Accessible severity badges pairing icons, labels, and guidance across
+            light and dark mode; unknown values never default to normal.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3 sm:grid-cols-2">
+          {SEVERITY_EXAMPLES.map((item) => (
+            <div className="rounded-lg border p-3 space-y-2" key={item.id}>
+              <p className="text-sm font-medium">{item.finding}</p>
+              <DefectSeverityBadge severity={item.severity} showDescription />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <StaffingPanel />
 
